@@ -2,6 +2,8 @@
  * User: puti.
  * Time: 2021/1/27 2:04 下午.
  */
+import {rgba2hex} from "@/utils/convertColor";
+
 const transform = require('css-to-react-native').default;
 const _ = require('lodash');
 const parse = require('./parse/index');
@@ -69,30 +71,61 @@ function getSizeValue(value, css, hairline) {
   }
 }
 
+function getFontSizeValue(value, css) {
+  if (typeof value === 'string') return value
+  if (css && value !== 0) {
+    return `FontSize(${value})`
+  } else {
+    return value
+  }
+}
+
 const IGNORE_LIST = ['backgroundSize', 'backgroundRepeat', 'backgroundImage']
+
+
+/**
+ * 合并属性
+ * @param style
+ * @param keys
+ * @param key
+ * @returns {{}}
+ */
+function mergeKeys(style, keys, key) {
+  if (keys.every(t => typeof style[t] !== "undefined" && (style[t] === style[keys[0]]))) {
+    style[key] = style[keys[0]]
+    style = _.omit(style, keys)
+  }
+  return style;
+}
+
 
 export function printJSONValue(obj, {css = true, hairline = true} = {}) {
   return _.keys(obj).reduce((memo, styleName) => {
     let style = obj[styleName];
-    const mergeKeys = ['borderTopLeftRadius',
+    const radiusKeys = ['borderTopLeftRadius',
       'borderTopRightRadius',
       'borderBottomRightRadius',
       'borderBottomLeftRadius'];
     // 合并radius
-    if (mergeKeys.every(t => style[t] === '50%')) {
+    if (radiusKeys.every(t => style[t] === '50%')) {
       style['borderRadius'] = Math.min(style.width, style.height) / 2
-      style = _.omit(style, mergeKeys)
+      style = _.omit(style, radiusKeys)
+    } else {
+      style = mergeKeys(style, radiusKeys, 'borderRadius')
     }
+    style = mergeKeys(style, ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth'], 'borderWidth')
+    style = mergeKeys(style, ['borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor'], 'borderColor')
     return `${memo} ${styleName}:{${_.keys(style).reduce((_memo, prop) => {
-      const value = style[prop];
+      let value = style[prop];
       if (_.includes(IGNORE_LIST, prop)) {
         return _memo;
       } else if (_.includes(CSS_LIST, prop)) {
         return `${_memo}  ${prop}: ${getSizeValue(value, css, hairline)},`
       } else if (typeof value === "string") {
+        value = rgba2hex(value)
         return `${_memo}  ${prop}:'${value}',`
       } else if (css && prop === 'fontSize') {
-        return `${_memo}  fontSize:FontSize(${value}),`
+        return `${_memo}  fontSize:${getFontSizeValue(value, css)},`
       } else if (prop === 'shadowOffset') {
         try {
           return `${_memo} shadowOffset:{width:${getSizeValue(value.width, css, hairline)},height:${getSizeValue(value.height, css, hairline)}},`
