@@ -80,6 +80,13 @@ export default function transformHTML(html, selector, styles, {requireImage = fa
   function renderTagWithProps({tag, nodeType, rawText, props: {class: className, children, ...props}}) {
     if (nodeType === 3) return String(rawText).trim()
     let _tag = tag;
+    
+    function handlerImageSource(url) {
+      props.source = requireImage ? `require('./images/${metadata.images[url] ? metadata.images[url] : className}.png')` : {uri: url};
+      if (!metadata.images[url]) metadata.images[url] = className;
+    }
+    
+    
     if (className) {
       props.style = `styles.${className}`;
       metadata.styles[className] = true;
@@ -87,10 +94,8 @@ export default function transformHTML(html, selector, styles, {requireImage = fa
         const {backgroundImage} = styles[className]
         const url = getUrl(backgroundImage)
         if (url) {
-          console.log('背景图', props, styles[className])
           _tag = 'ImageBackground'
-          props.source = requireImage ? `require('./images/${className}.png')` : {uri: url};
-          metadata.images[url] = className;
+          handlerImageSource(url)
           metadata.components['ImageBackground'] = true;
         }
       }
@@ -106,8 +111,7 @@ export default function transformHTML(html, selector, styles, {requireImage = fa
       case 'img':
         _tag = 'Image';
         if (props.src) {
-          props.source = requireImage ? `require('./images/${className}.png')` : {uri: props.src};
-          metadata.images[props.src] = className;
+          handlerImageSource(props.src)
           delete props.src;
         }
         metadata.components['Image'] = true

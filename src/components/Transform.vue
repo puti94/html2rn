@@ -58,7 +58,6 @@
 
 <script>
 import {codemirror} from 'vue-codemirror'
-import axios from 'axios'
 import transformHTML from '../utils/transformHTML'
 import prettier from 'prettier'
 import parserEspree from 'prettier/parser-espree'
@@ -84,6 +83,7 @@ import {
   Row,
 } from 'element-ui';
 import exportFile from "@/utils/exportFile";
+import downloadZip from "@/utils/downloadZip";
 
 export default {
   name: 'Transform',
@@ -214,7 +214,7 @@ const FontSize = (size) => {
   methods: {
     exportCode() {
       if (this.requireImage) {
-        axios.post('/api/download', {
+        downloadZip({
           html: this.singleFileStr,
           name: this.componentName,
           images: _.keys(this.viewMetadata.images).map(key => ({
