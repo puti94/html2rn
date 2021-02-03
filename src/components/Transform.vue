@@ -220,7 +220,7 @@ const FontSize = (size) => {
         axios.post('/api/download', {
           html: this.singleFileStr,
           name: this.componentName,
-          images: _.keys(this.images).map(key => ({
+          images: _.keys(this.viewMetadata.images).map(key => ({
             path: key,
             name: this.images[key]
           }))

@@ -9,28 +9,32 @@ const request = require('request');
 const JSZip = require('jszip');
 module.exports = async (req, res) => {
   const {images = [], html = '', name = 'index'} = req.body
-  const rootPath = path.resolve(__dirname, uuid());
+  const rootPath = path.resolve('root', uuid());
   const filePath = path.resolve(rootPath, name)
   const imagePath = path.resolve(filePath, 'images')
-  fs.mkdirSync(rootPath);
-  fs.mkdirSync(filePath);
-  fs.mkdirSync(imagePath);
-  const indexPath = path.resolve(filePath, 'index.js');
-  fs.writeFileSync(indexPath, html);
-  const imagePaths = await Promise.all(images.map(t => downloadFile(t.path, path.resolve(imagePath, `${t.name}.png`))))
-  const zip = new JSZip();
-  const fold = zip.folder(name)
-  const imagesFold = fold.folder('images')
-  fold.file(indexPath)
-  imagePaths.forEach(t => imagesFold.file(t))
-  const content = await zip.generateAsync({type: 'uint8array'})
-  const zipPath = path.resolve(rootPath, `${name}.zip`);
-  fs.writeFileSync(zipPath, content)
-  res.set({
-    "Content-Type": "application/octet-stream",//告诉浏览器这是一个二进制文件
-    "Content-Disposition": "attachment; filename=1.txt"//告诉浏览器这是一个需要下载的文件
-  });
-  fs.createReadStream(zipPath).pipe(res);
+  try {
+    fs.mkdirSync(rootPath);
+    fs.mkdirSync(filePath);
+    fs.mkdirSync(imagePath);
+    const indexPath = path.resolve(filePath, 'index.js');
+    fs.writeFileSync(indexPath, html);
+    const imagePaths = await Promise.all(images.map(t => downloadFile(t.path, path.resolve(imagePath, `${t.name}.png`))))
+    const zip = new JSZip();
+    const fold = zip.folder(name)
+    const imagesFold = fold.folder('images')
+    fold.file(indexPath)
+    imagePaths.forEach(t => imagesFold.file(t))
+    const content = await zip.generateAsync({type: 'uint8array'})
+    const zipPath = path.resolve(rootPath, `${name}.zip`);
+    fs.writeFileSync(zipPath, content)
+    res.set({
+      "Content-Type": "application/octet-stream",//告诉浏览器这是一个二进制文件
+      "Content-Disposition": "attachment; filename=1.txt"//告诉浏览器这是一个需要下载的文件
+    });
+    fs.createReadStream(zipPath).pipe(res);
+  } catch (e) {
+    res.send(e)
+  }
 }
 
 function downloadFile(imgPath, filepath) {
