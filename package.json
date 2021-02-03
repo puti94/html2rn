@@ -16,6 +16,7 @@
     "lodash": "^4.17.20",
     "node-html-parser": "^2.0.2",
     "prettier": "^2.2.1",
+    "request": "^2.88.2",
     "vue": "^2.6.11",
     "vue-codemirror": "^4.0.6",
     "webskit-gradient-parser": "^1.0.14"
