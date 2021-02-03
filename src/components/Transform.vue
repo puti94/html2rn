@@ -23,9 +23,6 @@
         <el-form-item label="组件名">
           <el-input v-model="name"/>
         </el-form-item>
-        <el-form-item label="组件名">
-          <el-input v-model="name"/>
-        </el-form-item>
       </el-form>
       <el-button @click="exportCode">
         下载

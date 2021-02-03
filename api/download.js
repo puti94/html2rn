@@ -9,7 +9,7 @@ const request = require('request');
 const JSZip = require('jszip');
 module.exports = async (req, res) => {
   const {images = [], html = '', name = 'index'} = req.body
-  const rootPath = path.resolve('root', uuid());
+  const rootPath = path.resolve("/tmp", uuid());
   const filePath = path.resolve(rootPath, name)
   const imagePath = path.resolve(filePath, 'images')
   try {
