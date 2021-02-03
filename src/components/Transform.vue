@@ -17,6 +17,12 @@
         <el-form-item label="1像素细线">
           <el-switch v-model="hairline"/>
         </el-form-item>
+        <el-form-item label="require图片">
+          <el-switch v-model="requireImage"/>
+        </el-form-item>
+        <el-form-item label="组件名">
+          <el-input v-model="name"/>
+        </el-form-item>
         <el-form-item label="组件名">
           <el-input v-model="name"/>
         </el-form-item>
@@ -55,6 +61,7 @@
 
 <script>
 import {codemirror} from 'vue-codemirror'
+import axios from 'axios'
 import transformHTML from '../utils/transformHTML'
 import prettier from 'prettier'
 import parserEspree from 'prettier/parser-espree'
@@ -103,7 +110,7 @@ export default {
   props: {},
   computed: {
     viewMetadata() {
-      return transformHTML(this.code, this.selector.trim() || 'body', this.styleObj)
+      return transformHTML(this.code, this.selector.trim() || 'body', this.styleObj, {requireImage: this.requireImage})
     },
     styleList() {
       return _.keys(this.viewMetadata.styles)
@@ -188,6 +195,7 @@ const FontSize = (size) => {
   data() {
     return {
       drawer: false,
+      requireImage: false,
       postCss: true,
       baseWidth: '375',
       hairline: true,
@@ -208,7 +216,18 @@ const FontSize = (size) => {
   },
   methods: {
     exportCode() {
-      exportFile(this.singleFileStr, `${this.componentName}.js`)
+      if (this.requireImage) {
+        axios.post('/api/download', {
+          html: this.singleFileStr,
+          name: this.componentName,
+          images: _.keys(this.images).map(key => ({
+            path: key,
+            name: this.images[key]
+          }))
+        })
+      } else {
+        exportFile(this.singleFileStr, `${this.componentName}.js`)
+      }
     }
   }
 }

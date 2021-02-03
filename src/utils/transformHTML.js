@@ -12,6 +12,9 @@ const _ = require('lodash');
 
 function getJsValue(value) {
   if (typeof value === 'string') {
+    if (value.startsWith('require')) {
+      return value
+    }
     return `'${value}'`
   } else if (typeof value === 'object') {
     return JSON.stringify(value)
@@ -58,7 +61,7 @@ function getUrl(url) {
   }
 }
 
-export default function transformHTML(html, selector, styles) {
+export default function transformHTML(html, selector, styles, {requireImage = false} = {}) {
   const metadata = {
     text: '',
     styles: {},
@@ -86,8 +89,8 @@ export default function transformHTML(html, selector, styles) {
         if (url) {
           console.log('背景图', props, styles[className])
           _tag = 'ImageBackground'
-          props.source = {uri: url};
-          metadata.images[url] = true;
+          props.source = requireImage ? `require('./images/${className}.png')` : {uri: url};
+          metadata.images[url] = className;
           metadata.components['ImageBackground'] = true;
         }
       }
@@ -103,8 +106,8 @@ export default function transformHTML(html, selector, styles) {
       case 'img':
         _tag = 'Image';
         if (props.src) {
-          props.source = {uri: props.src};
-          metadata.images[props.src] = true;
+          props.source = requireImage ? `require('./images/${className}.png')` : {uri: props.src};
+          metadata.images[props.src] = className;
           delete props.src;
         }
         metadata.components['Image'] = true
