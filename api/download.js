@@ -27,11 +27,7 @@ module.exports = async (req, res) => {
     const content = await zip.generateAsync({type: 'uint8array'})
     const zipPath = path.resolve(rootPath, `${name}.zip`);
     fs.writeFileSync(zipPath, content)
-    res.set({
-      "Content-Type": "application/octet-stream",//告诉浏览器这是一个二进制文件
-      "Content-Disposition": "attachment; filename=1.txt"//告诉浏览器这是一个需要下载的文件
-    });
-    fs.createReadStream(zipPath).pipe(res);
+    res.download(zipPath)
   } catch (e) {
     res.send(e)
   }
