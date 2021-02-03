@@ -222,7 +222,7 @@ const FontSize = (size) => {
           name: this.componentName,
           images: _.keys(this.viewMetadata.images).map(key => ({
             path: key,
-            name: this.images[key]
+            name: this.viewMetadata.images[key]
           }))
         })
       } else {
