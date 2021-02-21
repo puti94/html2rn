@@ -4,8 +4,9 @@
  */
 
 const request = require('request')
+const OSS_PATH = require('../cons').OSS_PATH
 module.exports = async (req, res) => {
-  const url = `https://lanhu.oss-cn-beijing.aliyuncs.com/${req.query.key}`;
+  const url = `${OSS_PATH}${req.query.key}`;
   const options = {
     url: url,
     encoding: null

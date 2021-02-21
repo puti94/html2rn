@@ -6,6 +6,7 @@ import axios from 'axios'
 import FileSave from 'file-saver'
 
 const JSZip = require('jszip');
+const OSS_PATH = require('../../cons').OSS_PATH;
 
 export default async function downloadZip({images = [], html = '', name = 'index'}) {
   try {
@@ -21,11 +22,14 @@ export default async function downloadZip({images = [], html = '', name = 'index
     console.log('错误', e)
   }
 }
+
+
 const getFile = url => {
+  url = url.replace(OSS_PATH, '')
   return new Promise((resolve, reject) => {
     let obj = {
       method: 'get',
-      url,
+      url: `/api/proxy?key=${url}`,
       responseType: 'blob'
     }
     axios(obj)
