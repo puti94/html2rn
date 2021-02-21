@@ -5,7 +5,7 @@
 
 const request = require('request')
 module.exports = async (req, res) => {
-  const url = 'https://lanhu.oss-cn-beijing.aliyuncs.com/SketchPng60979add04c29b9a6c6ef368e09990f058e5b71d60130e9a85d7e0698bd22e93';
+  const url = `https://lanhu.oss-cn-beijing.aliyuncs.com/${req.query.key}`;
   const options = {
     url: url,
     encoding: null
