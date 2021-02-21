@@ -4,6 +4,7 @@
  */
 import axios from 'axios'
 import FileSave from 'file-saver'
+
 const JSZip = require('jszip');
 
 export default async function downloadZip({images = [], html = '', name = 'index'}) {
@@ -25,7 +26,10 @@ const getFile = url => {
     let obj = {
       method: 'get',
       url,
-      responseType: 'blob'
+      responseType: 'blob',
+      headers: {
+        'Sec-Fetch-Mode': 'no-cors'
+      }
     }
     axios(obj)
         .then(data => {
