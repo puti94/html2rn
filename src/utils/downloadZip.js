@@ -26,10 +26,7 @@ const getFile = url => {
     let obj = {
       method: 'get',
       url,
-      responseType: 'blob',
-      headers: {
-        'Sec-Fetch-Mode': 'no-cors'
-      }
+      responseType: 'blob'
     }
     axios(obj)
         .then(data => {
